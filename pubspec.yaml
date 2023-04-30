@@ -42,10 +42,10 @@ dependencies:
 
 
 
- #flutter_native_splash:
-  #image: "assets/11.jpg"
-  #color: "#42a5f5"
-  #fill: true
+flutter_native_splash:
+  image: "assets/11.jpg"
+  color: "#42a5f5"
+  fill: true
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -14,7 +14,7 @@ import 'package:sqflitetask/screens/login.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(Login_Form());
+    await tester.pumpWidget(Splash());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

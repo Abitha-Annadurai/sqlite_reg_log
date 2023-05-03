@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflitetask/screens/profile_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'login_signup.dart';
 
 class Home extends StatelessWidget {
   final data;

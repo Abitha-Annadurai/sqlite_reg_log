@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflitetask/screens/signup.dart';
 import '../db/SQLHelper.dart';
 import 'Home.dart';
-import 'admin.dart';
-import 'login_signup.dart';
 
 class Login_Form extends StatefulWidget {
+  final data;
+  const Login_Form({Key? key, this.data}) : super(key: key);
+
   @override
   State<Login_Form> createState() => _Login_FormState();
 }
@@ -19,18 +19,72 @@ class _Login_FormState extends State<Login_Form> {
   final TextEditingController conemail = TextEditingController();
   final TextEditingController conpass = TextEditingController();
 
-  void logincheck(String email, String password) async {
+  List<dynamic> _users = [];
+
+  get data => data;
+
+  void _allUsers() async {
+    final data = await SQLHelper.getAll();
+    setState(() {
+      _users = data;
+      print(_users);
+    });
+  }
+
+  @override
+  void initState() {
+    _allUsers();
+    super.initState();
+  }
+
+  Future _checkUser(String email, String password) async {
+    final existingUser = _users.firstWhere((element) =>
+    element['email'] == email && element['password'] == password);
+    print(existingUser);
+    if (existingUser == null) {
+      setState(() {
+        //_error = "Invalid UserId / password";
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Invalid Mailid / Password!'),
+      ));
+    }
+    // print(existingUser['name']);
+    print(existingUser);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("login", true);
+    prefs.setString("name", existingUser['name']);
+    prefs.setInt("id", existingUser['id']);
+    prefs.setString("mobileno", existingUser['mobileno']);
+    prefs.setString("mailid", existingUser['mailid']);
+    prefs.setString("password", existingUser['password']);
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Home(data: data,)));
+    //_allUsers();
+  }
+
+
+  /*Future logincheck(String email, String password) async {
     if (email == 'admin@gmail.com' && password == '123456') {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminHome()));
     } else {
       var data = await SQLHelper.CheckLogin(email, password);
       if (data.isNotEmpty) {
-        //SharedPreferences prefs = await SharedPreferences.getInstance();
-        //prefs.setBool("firstView", true);
-        //prefs.setInt("id", data[0]['id']);
-        //prefs.setString("name", data[0]['name']);
-        //prefs.setString("email", data[0]['email']);
-        //prefs.setString("password", data[0]['password']);
+        final existingUser = _users.firstWhere((element) => element['email'] == email && element['password'] == password);
+        if (existingUser == null) {
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invalid Mailid / Password!'),
+          ));
+
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool("login", true);
+          prefs.setInt("id", existingUser['id']);
+          prefs.setString("email", existingUser['email']);
+          prefs.setString("password", existingUser['password']);
+          //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(data: data,)));
+        }
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(data: data,)));
         print('Login Success');
       } else if (data.isEmpty) {
@@ -38,7 +92,7 @@ class _Login_FormState extends State<Login_Form> {
         print('Login faild');
       }
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +177,7 @@ class _Login_FormState extends State<Login_Form> {
                   final valid = formkey.currentState!.validate();
 
                   if (valid) {
-                    logincheck(conemail.text, conpass.text);
+                    _checkUser(conemail.text, conpass.text);
                   } else {}
                 },
                 child: const Text("LOGIN"),
